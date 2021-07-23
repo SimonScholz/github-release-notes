@@ -1,5 +1,7 @@
 package com.ncorti.kotlin.gradle.template.plugin
 
+import okhttp3.Callback
+import okhttp3.Credentials
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -39,5 +41,23 @@ abstract class TemplateExampleTask : DefaultTask() {
         logger.lifecycle("$prettyTag outputFile is: ${outputFile.orNull}")
 
         outputFile.get().asFile.writeText("$prettyTag ${message.get()}")
+
+        val basic = Credentials.basic("", "")
+
+        val apiInterface = ApiInterface.create()
+
+        val latestRelease = apiInterface.getLatestRelease("MediaMarktSaturn", "mms-customer-delivery-promise", basic, "application/vnd.github.v3+json").execute()
+
+        val latestUpdatedPullRequests = apiInterface.getLatestUpdatedPullRequests("MediaMarktSaturn", "mms-customer-delivery-promise", basic, "application/vnd.github.v3+json").execute()
+
+        logger.lifecycle("$prettyTag latestRelease is: $latestRelease")
+        latestRelease.body()?.forEach {
+            logger.lifecycle("$prettyTag Release is: $it")
+        }
+
+        logger.lifecycle("$prettyTag latestUpdatedPullRequests is: $latestUpdatedPullRequests")
+        latestUpdatedPullRequests.body()?.forEach {
+            logger.lifecycle("$prettyTag PullRequest is: $it")
+        }
     }
 }
