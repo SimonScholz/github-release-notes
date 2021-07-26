@@ -1,5 +1,6 @@
 package com.ncorti.kotlin.gradle.template.plugin
 
+import com.google.gson.GsonBuilder
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -19,8 +20,11 @@ interface ApiInterface {
         var BASE_URL = "https://api.github.com/"
 
         fun create() : ApiInterface {
+            // 2021-06-29T11:53:14Z
+            val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()
+
             val retrofit = Retrofit.Builder()
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .baseUrl(BASE_URL)
                     .build()
             return retrofit.create(ApiInterface::class.java)

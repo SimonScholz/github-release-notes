@@ -13,9 +13,10 @@ abstract class TemplatePlugin : Plugin<Project> {
 
         // Add a task that uses configuration from the extension object
         project.tasks.register(TASK_NAME, TemplateExampleTask::class.java) {
-            it.tag.set(extension.tag)
-            it.message.set(extension.message)
-            it.outputFile.set(extension.outputFile)
+            it.username.set(extension.username)
+            it.password.set(extension.password)
+            it.owner.set(extension.owner)
+            it.projectName.set(extension.projectName)
         }
     }
 }

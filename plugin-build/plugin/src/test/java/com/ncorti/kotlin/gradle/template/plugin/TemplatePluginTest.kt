@@ -28,17 +28,18 @@ class TemplatePluginTest {
     fun `parameters are passed correctly from extension to task`() {
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("com.ncorti.kotlin.gradle.template.plugin")
-        val aFile = File(project.projectDir, ".tmp")
         (project.extensions.getByName("templateExampleConfig") as TemplateExtension).apply {
-            tag.set("a-sample-tag")
-            message.set("just-a-message")
-            outputFile.set(aFile)
+            username.set("SimonScholz")
+            password.set("just-a-secret")
+            owner.set("SimonScholz")
+            projectName.set("github-release-notes")
         }
 
         val task = project.tasks.getByName("templateExample") as TemplateExampleTask
 
-        assertEquals("a-sample-tag", task.tag.get())
-        assertEquals("just-a-message", task.message.get())
-        assertEquals(aFile, task.outputFile.get().asFile)
+        assertEquals("SimonScholz", task.username.get())
+        assertEquals("just-a-secret", task.password.get())
+        assertEquals("SimonScholz", task.owner.get())
+        assertEquals("github-release-notes", task.projectName.get())
     }
 }

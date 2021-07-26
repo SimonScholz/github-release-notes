@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
+import java.time.Instant
 
 abstract class TemplateExampleTask : DefaultTask() {
 
@@ -21,43 +22,39 @@ abstract class TemplateExampleTask : DefaultTask() {
     }
 
     @get:Input
-    @get:Option(option = "message", description = "A message to be printed in the output file")
-    abstract val message: Property<String>
+    @get:Option(option = "username", description = "")
+    abstract val username: Property<String>
 
     @get:Input
-    @get:Option(option = "tag", description = "A Tag to be used for debug and in the output file")
-    @get:Optional
-    abstract val tag: Property<String>
+    @get:Option(option = "password", description = "")
+    abstract val password: Property<String>
 
-    @get:OutputFile
-    abstract val outputFile: RegularFileProperty
+    @get:Input
+    @get:Option(option = "owner", description = "")
+    abstract val owner: Property<String>
+
+    @get:Input
+    @get:Option(option = "project", description = "")
+    abstract val projectName: Property<String>
 
     @TaskAction
     fun sampleAction() {
-        val prettyTag = tag.orNull?.let { "[$it]" } ?: ""
-
-        logger.lifecycle("$prettyTag message is: ${message.orNull}")
-        logger.lifecycle("$prettyTag tag is: ${tag.orNull}")
-        logger.lifecycle("$prettyTag outputFile is: ${outputFile.orNull}")
-
-        outputFile.get().asFile.writeText("$prettyTag ${message.get()}")
-
-        val basic = Credentials.basic("", "")
+        val basic = Credentials.basic(username.get(), password.get())
 
         val apiInterface = ApiInterface.create()
 
-        val latestRelease = apiInterface.getLatestRelease("MediaMarktSaturn", "mms-customer-delivery-promise", basic, "application/vnd.github.v3+json").execute()
+        val latestRelease = apiInterface.getLatestRelease(owner.get(), projectName.get(), basic, "application/vnd.github.v3+json").execute()
 
-        val latestUpdatedPullRequests = apiInterface.getLatestUpdatedPullRequests("MediaMarktSaturn", "mms-customer-delivery-promise", basic, "application/vnd.github.v3+json").execute()
+        val latestUpdatedPullRequests = apiInterface.getLatestUpdatedPullRequests(owner.get(), projectName.get(), basic, "application/vnd.github.v3+json").execute()
 
-        logger.lifecycle("$prettyTag latestRelease is: $latestRelease")
-        latestRelease.body()?.forEach {
-            logger.lifecycle("$prettyTag Release is: $it")
-        }
+        val pullRequests = latestRelease.body()?.get(0)?.published_at.let { published ->
+            latestUpdatedPullRequests.body()?.filter {
+                it.merged_at?.toInstant()?.isAfter(published?.toInstant()) ?: false
+            }
+        }?: latestUpdatedPullRequests.body()
 
-        logger.lifecycle("$prettyTag latestUpdatedPullRequests is: $latestUpdatedPullRequests")
-        latestUpdatedPullRequests.body()?.forEach {
-            logger.lifecycle("$prettyTag PullRequest is: $it")
+        pullRequests?.forEach {
+            logger.lifecycle("#${it.number} ${it.title}")
         }
     }
 }

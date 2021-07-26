@@ -4,5 +4,8 @@ plugins {
 }
 
 templateExampleConfig {
-    message.set("Just trying this gradle plugin...")
+    username.set("SimonScholz")
+    password.set("")
+    owner.set("MediaMarktSaturn")
+    projectName.set("mms-customer-delivery-promise")
 }
