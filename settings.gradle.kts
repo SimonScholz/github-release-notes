@@ -6,7 +6,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = ("kotlin-gradle-plugin-template")
+rootProject.name = ("github-release-notes")
 
 include(":example")
 includeBuild("plugin-build")

@@ -6,6 +6,13 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+val lineSeparator = System.getProperty("line.separator")
 
 abstract class GitHubReleaseNotesTask : DefaultTask() {
 
@@ -52,14 +59,33 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
             "application/vnd.github.v3+json"
         ).execute()
 
-        val pullRequests = latestRelease.body()?.get(0)?.publishedAt.let { published ->
+        val latestReleaseBody = latestRelease.body()?.get(0)
+
+        val pullRequests = latestReleaseBody?.publishedAt?.let { published ->
             latestUpdatedPullRequests.body()?.filter {
-                it.mergedAt?.toInstant()?.isAfter(published?.toInstant()) ?: false
+                it.mergedAt?.toInstant()?.isAfter(published.toInstant()) ?: false
             }
         } ?: latestUpdatedPullRequests.body()
 
-        pullRequests?.forEach {
-            logger.lifecycle("#${it.number} ${it.title}")
+        val releaseBody = pullRequests?.joinToString("") {
+            "#${it.number} ${it.title} $lineSeparator"
         }
+
+        val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
+        val releaseName = "Release $tagName"
+
+        val releaseCreationPayload = ReleaseCreationPayload(tagName, releaseName, releaseBody ?: "No Pull Requests to release")
+
+        logger.lifecycle(releaseCreationPayload.toString())
+
+        val createReleaseExecution = apiInterface.createRelease(
+            owner = owner.get(),
+            project = projectName.get(),
+            authorization = basic,
+            accept = "application/vnd.github.v3+json",
+            releaseCreationPayload = releaseCreationPayload,
+        ).execute()
+
+        logger.lifecycle("$createReleaseExecution")
     }
 }
