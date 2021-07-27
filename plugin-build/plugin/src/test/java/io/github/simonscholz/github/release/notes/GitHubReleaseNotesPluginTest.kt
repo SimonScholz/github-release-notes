@@ -1,41 +1,40 @@
-package com.ncorti.kotlin.gradle.template.plugin
+package io.github.simonscholz.github.release.notes
 
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
-import java.io.File
 
-class TemplatePluginTest {
+class GitHubReleaseNotesPluginTest {
 
     @Test
     fun `plugin is applied correctly to the project`() {
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.ncorti.kotlin.gradle.template.plugin")
+        project.pluginManager.apply("io.github.simonscholz.github.release.notes.plugin")
 
-        assert(project.tasks.getByName("templateExample") is TemplateExampleTask)
+        assert(project.tasks.getByName(TASK_NAME) is GitHubReleaseNotesTask)
     }
 
     @Test
-    fun `extension templateExampleConfig is created correctly`() {
+    fun `extension gitHubReleaseNotesConfig is created correctly`() {
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.ncorti.kotlin.gradle.template.plugin")
+        project.pluginManager.apply("io.github.simonscholz.github.release.notes.plugin")
 
-        assertNotNull(project.extensions.getByName("templateExampleConfig"))
+        assertNotNull(project.extensions.getByName("gitHubReleaseNotesConfig"))
     }
 
     @Test
     fun `parameters are passed correctly from extension to task`() {
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.ncorti.kotlin.gradle.template.plugin")
-        (project.extensions.getByName("templateExampleConfig") as TemplateExtension).apply {
+        project.pluginManager.apply("io.github.simonscholz.github.release.notes.plugin")
+        (project.extensions.getByName("gitHubReleaseNotesConfig") as GitHubReleaseNotesExtension).apply {
             username.set("SimonScholz")
             password.set("just-a-secret")
             owner.set("SimonScholz")
             projectName.set("github-release-notes")
         }
 
-        val task = project.tasks.getByName("templateExample") as TemplateExampleTask
+        val task = project.tasks.getByName(TASK_NAME) as GitHubReleaseNotesTask
 
         assertEquals("SimonScholz", task.username.get())
         assertEquals("just-a-secret", task.password.get())

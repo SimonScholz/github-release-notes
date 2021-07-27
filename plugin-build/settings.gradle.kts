@@ -6,6 +6,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = ("com.ncorti.kotlin.gradle.template")
+rootProject.name = ("io.github.simonscholz.github.release.notes")
 
 include(":plugin")

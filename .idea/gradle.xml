@@ -7,7 +7,7 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
-              <build path="$PROJECT_DIR$/plugin-build" name="com.ncorti.kotlin.gradle.template">
+              <build path="$PROJECT_DIR$/plugin-build" name="io.github.simonscholz.github.release.notes">
                 <projects>
                   <project path="$PROJECT_DIR$/plugin-build" />
                   <project path="$PROJECT_DIR$/plugin-build/plugin" />

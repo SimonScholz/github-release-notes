@@ -1,9 +1,9 @@
 plugins {
     java
-    id("com.ncorti.kotlin.gradle.template.plugin")
+    id("io.github.simonscholz.github.release.notes.plugin")
 }
 
-templateExampleConfig {
+gitHubReleaseNotesConfig {
     username.set("SimonScholz")
     password.set("")
     owner.set("MediaMarktSaturn")

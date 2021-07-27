@@ -1,20 +1,20 @@
 object PluginCoordinates {
-    const val ID = "com.ncorti.kotlin.gradle.template.plugin"
-    const val GROUP = "com.ncorti.kotlin.gradle.template"
+    const val ID = "io.github.simonscholz.github.release.notes.plugin"
+    const val GROUP = "io.github.simonscholz.github.release.notes"
     const val VERSION = "1.0.0"
-    const val IMPLEMENTATION_CLASS = "com.ncorti.kotlin.gradle.template.plugin.TemplatePlugin"
+    const val IMPLEMENTATION_CLASS = "io.github.simonscholz.github.release.notes.GitHubReleaseNotesPlugin"
 }
 
 object PluginBundle {
-    const val VCS = "https://github.com/cortinico/kotlin-gradle-plugin-template"
-    const val WEBSITE = "https://github.com/cortinico/kotlin-gradle-plugin-template"
-    const val DESCRIPTION = "An empty Gradle plugin created from a template"
-    const val DISPLAY_NAME = "An empty Gradle Plugin from a template"
+    const val VCS = "https://github.com/SimonScholz/github-release-notes"
+    const val WEBSITE = "https://github.com/SimonScholz/github-release-notes"
+    const val DESCRIPTION = "Gradle plugin to generate GitHub Release Notes"
+    const val DISPLAY_NAME = "GitHub Release Notes"
     val TAGS = listOf(
         "plugin",
         "gradle",
-        "sample",
-        "template"
+        "GitHub",
+        "Release Notes"
     )
 }
 
