@@ -7,9 +7,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.time.OffsetDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 val lineSeparator = System.getProperty("line.separator")
@@ -43,16 +41,16 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
     fun sampleAction() {
         val basic = Credentials.basic(username.get(), password.get())
 
-        val apiInterface = ApiInterface.create()
+        val gitHubApi = GitHubApi.create()
 
-        val latestRelease = apiInterface.getLatestRelease(
+        val latestRelease = gitHubApi.getLatestRelease(
             owner.get(),
             projectName.get(),
             basic,
             "application/vnd.github.v3+json"
         ).execute()
 
-        val latestUpdatedPullRequests = apiInterface.getLatestUpdatedPullRequests(
+        val latestUpdatedPullRequests = gitHubApi.getLatestUpdatedPullRequests(
             owner.get(),
             projectName.get(),
             basic,
@@ -78,7 +76,7 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
         logger.lifecycle(releaseCreationPayload.toString())
 
-        val createReleaseExecution = apiInterface.createRelease(
+        val createReleaseExecution = gitHubApi.createRelease(
             owner = owner.get(),
             project = projectName.get(),
             authorization = basic,

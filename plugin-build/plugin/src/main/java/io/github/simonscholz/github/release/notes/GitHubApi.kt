@@ -10,7 +10,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-interface ApiInterface {
+interface GitHubApi {
 
     @GET("repos/{owner}/{project}/pulls?state=closed&base=master&sort=updated&direction=desc&per_page=100")
     fun getLatestUpdatedPullRequests(
@@ -40,7 +40,7 @@ interface ApiInterface {
     companion object {
         var BASE_URL = "https://api.github.com/"
 
-        fun create(): ApiInterface {
+        fun create(): GitHubApi {
             // 2021-06-29T11:53:14Z
             val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()
 
@@ -48,7 +48,7 @@ interface ApiInterface {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .baseUrl(BASE_URL)
                 .build()
-            return retrofit.create(ApiInterface::class.java)
+            return retrofit.create(GitHubApi::class.java)
         }
     }
 }
