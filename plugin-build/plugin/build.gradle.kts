@@ -50,8 +50,8 @@ pluginBundle {
 
 tasks.create("setupPluginUploadFromEnvironment") {
     doLast {
-        val key = System.getenv("GRADLE_PUBLISH_KEY")
-        val secret = System.getenv("GRADLE_PUBLISH_SECRET")
+        val key = project.properties["GRADLE_PUBLISH_KEY"]?.toString() ?: System.getenv("GRADLE_PUBLISH_KEY")
+        val secret = project.properties["GRADLE_PUBLISH_KEY"]?.toString() ?: System.getenv("GRADLE_PUBLISH_SECRET")
 
         if (key == null || secret == null) {
             throw GradleException("gradlePublishKey and/or gradlePublishSecret are not defined environment variables")

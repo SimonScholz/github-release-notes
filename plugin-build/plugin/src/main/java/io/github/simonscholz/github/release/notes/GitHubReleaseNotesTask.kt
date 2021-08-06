@@ -39,22 +39,18 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
     @TaskAction
     fun sampleAction() {
-        val basic = Credentials.basic(username.get(), password.get())
+        val basicAuth = Credentials.basic(username.get(), password.get())
 
-        val gitHubApi = GitHubApi.create()
+        val gitHubApi = GitHubApi.create(basicAuth)
 
         val latestRelease = gitHubApi.getLatestRelease(
             owner.get(),
             projectName.get(),
-            basic,
-            "application/vnd.github.v3+json"
         ).execute()
 
         val latestUpdatedPullRequests = gitHubApi.getLatestUpdatedPullRequests(
             owner.get(),
             projectName.get(),
-            basic,
-            "application/vnd.github.v3+json"
         ).execute()
 
         val latestReleaseBody = latestRelease.body()?.get(0)
@@ -72,15 +68,13 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
         val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
         val releaseName = "Release $tagName"
 
-        val releaseCreationPayload = ReleaseCreationPayload(tagName, releaseName, releaseBody ?: "No Pull Requests to release")
+        val releaseCreationPayload = ReleaseCreationPayload(tagName, releaseName, releaseBody ?: "No Pull Requests")
 
         logger.lifecycle(releaseCreationPayload.toString())
 
         val createReleaseExecution = gitHubApi.createRelease(
             owner = owner.get(),
             project = projectName.get(),
-            authorization = basic,
-            accept = "application/vnd.github.v3+json",
             releaseCreationPayload = releaseCreationPayload,
         ).execute()
 
