@@ -68,7 +68,11 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
         val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
         val releaseName = "Release $tagName"
 
-        val releaseCreationRequestPayload = ReleaseCreationRequestPayload(tagName, releaseName, releaseBody ?: "No Pull Requests")
+        val releaseCreationRequestPayload = ReleaseCreationRequestPayload(
+            tagName,
+            releaseName,
+            releaseBody ?: "No Pull Requests"
+        )
 
         logger.lifecycle(releaseCreationRequestPayload.toString())
 
@@ -80,13 +84,17 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
         logger.lifecycle("$createReleaseExecution")
 
-        logger.lifecycle("""
+        val releaseUrl = createReleaseExecution.body()?.url
+
+        logger.lifecycle(
+            """
             :microphone2: :bounce: @here ARC will deploy our new release $releaseName for our
             ${projectName.get()} service to PROD in a couple of minutes. Changes going live:
-                ```
-                $releaseBody
-                ```
-            Feel free to explore all release notes and see the full diff in code here: ${createReleaseExecution.body()?.url}
-        """.trimIndent())
+            ```
+            $releaseBody
+            ```
+            Feel free to explore all release notes and see the full diff in code here: $releaseUrl
+            """.trimIndent()
+        )
     }
 }
