@@ -10,7 +10,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-val lineSeparator = System.getProperty("line.separator")
+val lineSeparator: String = System.getProperty("line.separator")
 
 abstract class GitHubReleaseNotesTask : DefaultTask() {
 
@@ -68,16 +68,25 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
         val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
         val releaseName = "Release $tagName"
 
-        val releaseCreationPayload = ReleaseCreationPayload(tagName, releaseName, releaseBody ?: "No Pull Requests")
+        val releaseCreationRequestPayload = ReleaseCreationRequestPayload(tagName, releaseName, releaseBody ?: "No Pull Requests")
 
-        logger.lifecycle(releaseCreationPayload.toString())
+        logger.lifecycle(releaseCreationRequestPayload.toString())
 
         val createReleaseExecution = gitHubApi.createRelease(
             owner = owner.get(),
             project = projectName.get(),
-            releaseCreationPayload = releaseCreationPayload,
+            releaseCreationRequestPayload = releaseCreationRequestPayload,
         ).execute()
 
         logger.lifecycle("$createReleaseExecution")
+
+        logger.lifecycle("""
+            :microphone2: :bounce: @here ARC will deploy our new release $releaseName for our
+            ${projectName.get()} service to PROD in a couple of minutes. Changes going live:
+                ```
+                $releaseBody
+                ```
+            Feel free to explore all release notes and see the full diff in code here: ${createReleaseExecution.body()?.url}
+        """.trimIndent())
     }
 }

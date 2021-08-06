@@ -2,7 +2,7 @@ package io.github.simonscholz.github.release.notes
 
 import com.google.gson.annotations.SerializedName
 
-data class ReleaseCreationPayload(
+data class ReleaseCreationRequestPayload(
     @SerializedName("tag_name") val tagName: String,
     val name: String,
     val body: String,

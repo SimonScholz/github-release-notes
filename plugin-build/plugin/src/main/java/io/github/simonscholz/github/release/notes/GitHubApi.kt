@@ -26,8 +26,8 @@ interface GitHubApi {
     fun createRelease(
         @Path("owner") owner: String,
         @Path("project") project: String,
-        @Body releaseCreationPayload: ReleaseCreationPayload,
-    ): Call<Any>
+        @Body releaseCreationRequestPayload: ReleaseCreationRequestPayload,
+    ): Call<ReleaseCreationResponsePayload>
 
     companion object {
         var BASE_URL = "https://api.github.com/"
