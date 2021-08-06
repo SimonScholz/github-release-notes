@@ -53,6 +53,8 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
             projectName.get(),
         ).execute()
 
+        logger.lifecycle(latestUpdatedPullRequests.toString())
+
         val latestReleaseBody = latestRelease.body()?.get(0)
 
         val pullRequests = latestReleaseBody?.publishedAt?.let { published ->
@@ -88,12 +90,14 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
         logger.lifecycle(
             """
-            :microphone2: :bounce: @here ARC will deploy our new release $releaseName for our
-            ${projectName.get()} service to PROD in a couple of minutes. Changes going live:
-            ```
-            $releaseBody
-            ```
-            Feel free to explore all release notes and see the full diff in code here: $releaseUrl
+$lineSeparator
+:microphone2: :bounce: @here ARC will deploy our new release $releaseName for our
+${projectName.get()} service to PROD in a couple of minutes. Changes going live:
+```
+${releaseBody?.trim()}
+```
+Feel free to explore all release notes and see the full diff in code here: $releaseUrl
+$lineSeparator
             """.trimIndent()
         )
     }
