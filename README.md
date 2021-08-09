@@ -1,13 +1,16 @@
 ## How to use 👣
 
 Adjust the `build.gradle.kts` file in the `example` project
-with your username and personal GitHub access token aka password and desired owner + project.
+with your username + personal GitHub access token aka password and desired owner + project.
 
 You can run the following gradle task to create a draft release for your desired project:
 
 ```
 ./gradlew example:gitHubReleaseNotesTask
 ```
+
+In the console you'll also find a proper announcement for the webshop  deployment channel
+which you can copy and paste.
 
 ## Features 🎨
 
