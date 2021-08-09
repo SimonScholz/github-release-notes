@@ -13,6 +13,8 @@ abstract class GitHubReleaseNotesExtension @Inject constructor(project: Project)
 
     val password: Property<String> = objects.property(String::class.java)
 
+    val gitHubToken: Property<String> = objects.property(String::class.java)
+
     val owner: Property<String> = objects.property(String::class.java)
 
     val projectName: Property<String> = objects.property(String::class.java)

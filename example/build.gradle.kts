@@ -4,11 +4,9 @@ plugins {
 }
 
 gitHubReleaseNotesConfig {
-    username.set("SimonScholz")
-    password.set(
-        project.property("GITHUB_ACCESS_TOKEN")?.toString()
-            ?: throw GradleException("GITHUB_ACCESS_TOKEN is missing in your ~/home/.gradle/gradle.properties")
-    )
+    project.findProperty("GITHUB_TOKEN")?.let{gitHubToken.set(it.toString())}
+    project.findProperty("GITHUB_USER_NAME")?.let{username.set(it.toString())}
+    project.findProperty("GITHUB_USER_ACCESS_TOKEN")?.let{password.set(it.toString())}
     owner.set("MediaMarktSaturn")
     projectName.set("mms-customer-delivery-promise")
 }

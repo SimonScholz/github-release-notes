@@ -24,6 +24,7 @@ abstract class GitHubReleaseNotesPlugin : Plugin<Project> {
         project.tasks.register(RELEASE_PRINTER_TASK_NAME, PrintGitHubReleaseNotes::class.java) {
             it.username.set(extension.username)
             it.password.set(extension.password)
+            it.gitHubToken.set(extension.gitHubToken)
             it.owner.set(extension.owner)
             it.projectName.set(extension.projectName)
         }

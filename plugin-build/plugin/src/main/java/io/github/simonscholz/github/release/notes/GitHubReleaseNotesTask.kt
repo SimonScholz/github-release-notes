@@ -4,6 +4,7 @@ import okhttp3.Credentials
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.time.OffsetDateTime
@@ -21,11 +22,18 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
     @get:Input
     @get:Option(option = "username", description = "")
+    @get:Optional
     abstract val username: Property<String>
 
     @get:Input
     @get:Option(option = "password", description = "")
+    @get:Optional
     abstract val password: Property<String>
+
+    @get:Input
+    @get:Option(option = "gitHubToken", description = "")
+    @get:Optional
+    abstract val gitHubToken: Property<String>
 
     @get:Input
     @get:Option(option = "owner", description = "")
@@ -37,9 +45,10 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
     @TaskAction
     fun gitHubReleaseNotesAction() {
-        val basicAuth = Credentials.basic(username.get(), password.get())
+        val auth = if (gitHubToken.isPresent) "Bearer ${gitHubToken.get()}"
+        else Credentials.basic(username.get(), password.get())
 
-        val gitHubApi = GitHubApi.create(basicAuth)
+        val gitHubApi = GitHubApi.create(auth)
 
         val latestRelease = gitHubApi.getLatestRelease(
             owner.get(),
