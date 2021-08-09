@@ -10,12 +10,10 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-val lineSeparator: String = System.getProperty("line.separator")
-
-abstract class GitHubReleaseNotesTask : DefaultTask() {
+abstract class PrintGitHubReleaseNotes : DefaultTask() {
 
     init {
-        description = "Generates a draft release containing all PRs in the description"
+        description = "Prints release notes containing all PRs in the description"
         group = "GitHub release plugin"
     }
 
@@ -36,7 +34,7 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
     abstract val projectName: Property<String>
 
     @TaskAction
-    fun gitHubReleaseNotesAction() {
+    fun printGitHubReleaseNotesAction() {
         val basicAuth = Credentials.basic(username.get(), password.get())
 
         val gitHubApi = GitHubApi.create(basicAuth)
@@ -51,7 +49,7 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
             projectName.get(),
         ).execute()
 
-        logger.lifecycle(latestUpdatedPullRequests.toString())
+        logger.lifecycle(latestUpdatedPullRequests.toString() + lineSeparator)
 
         val latestReleaseBody = latestRelease.body()?.get(0)
 
@@ -61,42 +59,15 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
             }
         } ?: latestUpdatedPullRequests.body()
 
+        val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
+        val releaseName = "Release $tagName"
+
+        logger.lifecycle(releaseName + lineSeparator)
+
         val releaseBody = pullRequests?.joinToString("") {
             "#${it.number} ${it.title} $lineSeparator"
         }
 
-        val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
-        val releaseName = "Release $tagName"
-
-        val releaseCreationRequestPayload = ReleaseCreationRequestPayload(
-            tagName,
-            releaseName,
-            releaseBody ?: "No Pull Requests"
-        )
-
-        logger.lifecycle(releaseCreationRequestPayload.toString())
-
-        val createReleaseExecution = gitHubApi.createRelease(
-            owner = owner.get(),
-            project = projectName.get(),
-            releaseCreationRequestPayload = releaseCreationRequestPayload,
-        ).execute()
-
-        logger.lifecycle("$createReleaseExecution")
-
-        val releaseUrl = createReleaseExecution.body()?.url
-
-        logger.lifecycle(
-            """
-$lineSeparator
-:microphone2: :bounce: @here ARC will deploy our new release $releaseName for our
-${projectName.get()} service to PROD in a couple of minutes. Changes going live:
-```
-${releaseBody?.trim()}
-```
-Feel free to explore all release notes and see the full diff in code here: $releaseUrl
-$lineSeparator
-            """.trimIndent()
-        )
+        logger.lifecycle(releaseBody)
     }
 }

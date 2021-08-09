@@ -12,7 +12,7 @@ class GitHubReleaseNotesPluginTest {
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("io.github.simonscholz.github.release.notes.plugin")
 
-        assert(project.tasks.getByName(TASK_NAME) is GitHubReleaseNotesTask)
+        assert(project.tasks.getByName(RELEASE_CREATOR_TASK_NAME) is GitHubReleaseNotesTask)
     }
 
     @Test
@@ -34,7 +34,7 @@ class GitHubReleaseNotesPluginTest {
             projectName.set("github-release-notes")
         }
 
-        val task = project.tasks.getByName(TASK_NAME) as GitHubReleaseNotesTask
+        val task = project.tasks.getByName(RELEASE_CREATOR_TASK_NAME) as GitHubReleaseNotesTask
 
         assertEquals("SimonScholz", task.username.get())
         assertEquals("just-a-secret", task.password.get())
