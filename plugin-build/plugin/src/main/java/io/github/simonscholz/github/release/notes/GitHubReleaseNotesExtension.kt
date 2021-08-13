@@ -18,4 +18,9 @@ abstract class GitHubReleaseNotesExtension @Inject constructor(project: Project)
     val owner: Property<String> = objects.property(String::class.java)
 
     val projectName: Property<String> = objects.property(String::class.java)
+
+    val deploymentAnnouncement: Property<String> = objects.property(String::class.java)
+
+    val teamName: Property<String> = objects.property(String::class.java)
+
 }

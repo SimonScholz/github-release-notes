@@ -19,6 +19,8 @@ abstract class GitHubReleaseNotesPlugin : Plugin<Project> {
             it.gitHubToken.set(extension.gitHubToken)
             it.owner.set(extension.owner)
             it.projectName.set(extension.projectName)
+            it.deploymentAnnouncement.set(extension.deploymentAnnouncement)
+            it.teamName.set(extension.teamName)
         }
 
         // Add a task that uses configuration from the extension object

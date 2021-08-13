@@ -36,6 +36,16 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
     abstract val gitHubToken: Property<String>
 
     @get:Input
+    @get:Option(option = "deploymentAnnouncement", description = "")
+    @get:Optional
+    abstract val deploymentAnnouncement: Property<String>
+
+    @get:Input
+    @get:Option(option = "teamName", description = "")
+    @get:Optional
+    abstract val teamName: Property<String>
+
+    @get:Input
     @get:Option(option = "owner", description = "")
     abstract val owner: Property<String>
 
@@ -72,7 +82,7 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
         val releaseBody = pullRequests?.joinToString("") {
             "#${it.number} ${it.title} $lineSeparator"
-        }
+        }?.trimMargin()
 
         val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
         val releaseName = "Release $tagName"
@@ -95,17 +105,20 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
         val releaseUrl = createReleaseExecution.body()?.url
 
+        val announcement = Announcement.createAnnouncement(
+            teamName.getOrElse("ARC"),
+            releaseName,
+            projectName.get(),
+            releaseBody ?: "No PRs for this release",
+            releaseUrl ?: "",
+            deploymentAnnouncement.orNull
+        )
+
         logger.lifecycle(
             """
 $lineSeparator
-:microphone2: :bounce: @here ARC will deploy our new release $releaseName for our
-${projectName.get()} service to PROD in a couple of minutes. Changes going live:
-```
-${releaseBody?.trim()}
-```
-Feel free to explore all release notes and see the full diff in code here: $releaseUrl
+$announcement
 $lineSeparator
-            """.trimIndent()
-        )
+              """.trimIndent())
     }
 }
