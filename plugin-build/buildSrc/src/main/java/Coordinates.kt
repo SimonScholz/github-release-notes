@@ -1,7 +1,7 @@
 object PluginCoordinates {
     const val ID = "io.github.simonscholz.github.release.notes.plugin"
     const val GROUP = "io.github.simonscholz.github.release.notes"
-    const val VERSION = "1.3.0"
+    const val VERSION = "1.4.0"
     const val IMPLEMENTATION_CLASS = "io.github.simonscholz.github.release.notes.GitHubReleaseNotesPlugin"
 }
 

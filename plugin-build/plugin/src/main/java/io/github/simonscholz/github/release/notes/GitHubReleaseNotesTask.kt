@@ -103,14 +103,15 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
 
         logger.lifecycle("$createReleaseExecution")
 
-        val releaseUrl = createReleaseExecution.body()?.url
+        // Craft final release url instead of using createReleaseExecution.body()?.url
+        val finalReleaseUrl = "https://github.com/${owner.get()}/${projectName.get()}/releases/tag/$releaseName"
 
         val announcement = Announcement.createAnnouncement(
             teamName.getOrElse("ARC"),
             releaseName,
             projectName.get(),
             releaseBody ?: "No PRs for this release",
-            releaseUrl ?: "",
+            finalReleaseUrl ?: "",
             deploymentAnnouncement.orNull
         )
 
