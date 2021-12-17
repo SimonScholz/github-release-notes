@@ -12,10 +12,11 @@ import retrofit2.http.Path
 
 interface GitHubApi {
 
-    @GET("repos/{owner}/{project}/pulls?state=closed&base=master&sort=updated&direction=desc&per_page=100")
+    @GET("repos/{owner}/{project}/pulls?state=closed&base={baseBranch}&sort=updated&direction=desc&per_page=100")
     fun getLatestUpdatedPullRequests(
         @Path("owner") owner: String,
         @Path("project") project: String,
+        baseBranch: String,
     ): Call<List<PullRequest>>
 
     @GET("repos/{owner}/{project}/releases?per_page=1")
