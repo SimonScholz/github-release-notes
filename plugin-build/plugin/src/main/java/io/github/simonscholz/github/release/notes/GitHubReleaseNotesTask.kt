@@ -65,24 +65,43 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
             projectName.get(),
         ).execute()
 
-        val latestUpdatedPullRequests = gitHubApi.getLatestUpdatedPullRequests(
+        val latestUpdatedPullRequestsMaster = gitHubApi.getLatestUpdatedPullRequests(
             owner.get(),
             projectName.get(),
+            "master"
         ).execute()
+
+        val latestUpdatedPullRequestsMain = gitHubApi.getLatestUpdatedPullRequests(
+                owner.get(),
+                projectName.get(),
+                "main"
+        ).execute()
+
+        val latestUpdatedPullRequestsTest = gitHubApi.getLatestUpdatedPullRequests(
+                owner.get(),
+                projectName.get(),
+                "test"
+        ).execute()
+
+
+        val latestUpdatedPullRequests = mutableListOf<PullRequest>()
+        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsMaster.body() ?: emptyList())
+        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsMain.body() ?: emptyList())
+        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsTest.body() ?: emptyList())
 
         logger.lifecycle(latestUpdatedPullRequests.toString())
 
         val latestReleaseBody = latestRelease.body()?.get(0)
 
         val pullRequests = latestReleaseBody?.publishedAt?.let { published ->
-            latestUpdatedPullRequests.body()?.filter {
+            latestUpdatedPullRequests.filter {
                 it.mergedAt?.toInstant()?.isAfter(published.toInstant()) ?: false
             }
-        } ?: latestUpdatedPullRequests.body()
+        } ?: latestUpdatedPullRequests
 
-        val releaseBody = pullRequests?.joinToString("") {
+        val releaseBody = pullRequests.joinToString("") {
             "#${it.number} ${it.title} $lineSeparator"
-        }?.trimMargin()
+        }.trimMargin()
 
         val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
         val releaseName = "Release $tagName"
@@ -90,7 +109,7 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
         val releaseCreationRequestPayload = ReleaseCreationRequestPayload(
             tagName,
             releaseName,
-            releaseBody ?: "No Pull Requests"
+            releaseBody
         )
 
         logger.lifecycle(releaseCreationRequestPayload.toString())
@@ -110,7 +129,7 @@ abstract class GitHubReleaseNotesTask : DefaultTask() {
             teamName.getOrElse("ARC"),
             releaseName,
             projectName.get(),
-            releaseBody ?: "No PRs for this release",
+            releaseBody,
             finalReleaseUrl,
             deploymentAnnouncement.orNull
         )

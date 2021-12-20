@@ -53,27 +53,46 @@ abstract class PrintGitHubReleaseNotes : DefaultTask() {
             projectName.get(),
         ).execute()
 
-        val latestUpdatedPullRequests = gitHubApi.getLatestUpdatedPullRequests(
-            owner.get(),
-            projectName.get(),
+        val latestUpdatedPullRequestsMaster = gitHubApi.getLatestUpdatedPullRequests(
+                owner.get(),
+                projectName.get(),
+                "master"
         ).execute()
+
+        val latestUpdatedPullRequestsMain = gitHubApi.getLatestUpdatedPullRequests(
+                owner.get(),
+                projectName.get(),
+                "main"
+        ).execute()
+
+        val latestUpdatedPullRequestsTest = gitHubApi.getLatestUpdatedPullRequests(
+                owner.get(),
+                projectName.get(),
+                "test"
+        ).execute()
+
+
+        val latestUpdatedPullRequests = mutableListOf<PullRequest>()
+        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsMaster.body() ?: emptyList())
+        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsMain.body() ?: emptyList())
+        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsTest.body() ?: emptyList())
 
         logger.lifecycle(latestUpdatedPullRequests.toString() + lineSeparator)
 
         val latestReleaseBody = latestRelease.body()?.get(0)
 
         val pullRequests = latestReleaseBody?.publishedAt?.let { published ->
-            latestUpdatedPullRequests.body()?.filter {
+            latestUpdatedPullRequests.filter {
                 it.mergedAt?.toInstant()?.isAfter(published.toInstant()) ?: false
             }
-        } ?: latestUpdatedPullRequests.body()
+        } ?: latestUpdatedPullRequests
 
         val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
         val releaseName = "Release $tagName"
 
         logger.lifecycle(releaseName + lineSeparator)
 
-        val releaseBody = pullRequests?.joinToString("") {
+        val releaseBody = pullRequests.joinToString("") {
             "#${it.number} ${it.title} $lineSeparator"
         }
 
