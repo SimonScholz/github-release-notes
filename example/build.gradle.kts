@@ -7,6 +7,9 @@ gitHubReleaseNotesConfig {
     project.findProperty("GITHUB_TOKEN")?.let {
         gitHubToken.set(it.toString())
     }
+    project.findProperty("BASE_BRANCH")?.let {
+        baseBranch.set(it.toString())
+    }
     project.findProperty("GITHUB_USER_NAME")?.let {
         username.set(it.toString())
     }

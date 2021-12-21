@@ -34,6 +34,11 @@ abstract class PrintGitHubReleaseNotes : DefaultTask() {
     abstract val gitHubToken: Property<String>
 
     @get:Input
+    @get:Option(option = "baseBranch", description = "")
+    @get:Optional
+    abstract val baseBranch: Property<String>
+
+    @get:Input
     @get:Option(option = "owner", description = "")
     abstract val owner: Property<String>
 
@@ -53,29 +58,11 @@ abstract class PrintGitHubReleaseNotes : DefaultTask() {
             projectName.get(),
         ).execute()
 
-        val latestUpdatedPullRequestsMaster = gitHubApi.getLatestUpdatedPullRequests(
+        val latestUpdatedPullRequests = gitHubApi.getLatestUpdatedPullRequests(
                 owner.get(),
                 projectName.get(),
-                "master"
-        ).execute()
-
-        val latestUpdatedPullRequestsMain = gitHubApi.getLatestUpdatedPullRequests(
-                owner.get(),
-                projectName.get(),
-                "main"
-        ).execute()
-
-        val latestUpdatedPullRequestsTest = gitHubApi.getLatestUpdatedPullRequests(
-                owner.get(),
-                projectName.get(),
-                "test"
-        ).execute()
-
-
-        val latestUpdatedPullRequests = mutableListOf<PullRequest>()
-        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsMaster.body() ?: emptyList())
-        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsMain.body() ?: emptyList())
-        latestUpdatedPullRequests.addAll(latestUpdatedPullRequestsTest.body() ?: emptyList())
+            if (baseBranch.isPresent) baseBranch.get() else "master"
+        ).execute().body() ?: mutableListOf()
 
         logger.lifecycle(latestUpdatedPullRequests.toString() + lineSeparator)
 
