@@ -17,6 +17,7 @@ abstract class GitHubReleaseNotesPlugin : Plugin<Project> {
             it.username.set(extension.username)
             it.password.set(extension.password)
             it.gitHubToken.set(extension.gitHubToken)
+            it.baseBranch.set(extension.baseBranch)
             it.owner.set(extension.owner)
             it.projectName.set(extension.projectName)
             it.deploymentAnnouncement.set(extension.deploymentAnnouncement)
@@ -28,6 +29,7 @@ abstract class GitHubReleaseNotesPlugin : Plugin<Project> {
             it.username.set(extension.username)
             it.password.set(extension.password)
             it.gitHubToken.set(extension.gitHubToken)
+            it.baseBranch.set(extension.baseBranch)
             it.owner.set(extension.owner)
             it.projectName.set(extension.projectName)
         }

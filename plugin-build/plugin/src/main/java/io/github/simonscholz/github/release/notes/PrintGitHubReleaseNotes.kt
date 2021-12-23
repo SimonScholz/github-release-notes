@@ -34,6 +34,11 @@ abstract class PrintGitHubReleaseNotes : DefaultTask() {
     abstract val gitHubToken: Property<String>
 
     @get:Input
+    @get:Option(option = "baseBranch", description = "")
+    @get:Optional
+    abstract val baseBranch: Property<String>
+
+    @get:Input
     @get:Option(option = "owner", description = "")
     abstract val owner: Property<String>
 
@@ -54,26 +59,27 @@ abstract class PrintGitHubReleaseNotes : DefaultTask() {
         ).execute()
 
         val latestUpdatedPullRequests = gitHubApi.getLatestUpdatedPullRequests(
-            owner.get(),
-            projectName.get(),
-        ).execute()
+                owner.get(),
+                projectName.get(),
+            if (baseBranch.isPresent) baseBranch.get() else "master"
+        ).execute().body() ?: mutableListOf()
 
         logger.lifecycle(latestUpdatedPullRequests.toString() + lineSeparator)
 
         val latestReleaseBody = latestRelease.body()?.get(0)
 
         val pullRequests = latestReleaseBody?.publishedAt?.let { published ->
-            latestUpdatedPullRequests.body()?.filter {
+            latestUpdatedPullRequests.filter {
                 it.mergedAt?.toInstant()?.isAfter(published.toInstant()) ?: false
             }
-        } ?: latestUpdatedPullRequests.body()
+        } ?: latestUpdatedPullRequests
 
         val tagName = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
         val releaseName = "Release $tagName"
 
         logger.lifecycle(releaseName + lineSeparator)
 
-        val releaseBody = pullRequests?.joinToString("") {
+        val releaseBody = pullRequests.joinToString("") {
             "#${it.number} ${it.title} $lineSeparator"
         }
 
