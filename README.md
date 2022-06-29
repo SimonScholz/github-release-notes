@@ -13,8 +13,25 @@ gitHubReleaseNotesConfig {
     project.findProperty("GITHUB_USER_ACCESS_TOKEN")?.let{password.set(it.toString())}
     owner.set("SimonScholz")
     projectName.set("github-release-notes")
+    deploymentAnnouncement.set(
+        """
+:egg: @here {0} will deploy our new release {1} to PROD in a couple of minutes. Changes going live:
+\```
+{3}
+\```
+Feel free to explore all release notes and see the full diff in code here: {4}
+        """.trimIndent()
+    )
 }
 ```
+
+The values of the deploymentAnnouncement placeholders are:
+
+* {0} - Team Name
+* {1} - Release Name
+* {2} - Project Name
+* {3} - Release Body (Containing the PRs being merged since the last release)
+* {4} - Url to the GitHub Release
 
 ### Test in within this repo
 
